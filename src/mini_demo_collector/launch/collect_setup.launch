@@ -1,0 +1,18 @@
+<launch>
+  <include file="$(find fr3_moveit_config)/launch/franka_control_fr3.launch" />
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster" args="0 0 0 0 0 0 world fr3_link0" /> -->
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base2refdepth" args="0.8333 0.8867 0.5827 -0.3355 -0.8184 0.4198 0.2037 fr3_link0 camera"/>
+<!-- 
+  <node pkg="tf2_ros" type="static_transform_publisher" name="static_table_tf"
+      args="0 0 0 0 0 0.785 fr3_link0 table" /> -->
+
+      <node pkg="tf2_ros" type="static_transform_publisher" name="static_table_tf"
+      args="0 0 0 0.785398 0 0 fr3_link0 table" />
+
+  <node pkg="rc_genicam_driver" type="rc_genicam_driver" name="rc_genicam_driver" output="screen">
+    <param name="_device" value=":02938180"/>
+  </node>
+
+  </launch>

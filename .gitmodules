@@ -1,0 +1,3 @@
+[submodule "src/fr3_moveit_config"]
+	path = src/fr3_moveit_config
+	url = https://github.com/utomm/fr3_moveit_config.git
