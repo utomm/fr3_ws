@@ -62,7 +62,7 @@ def move_to_joint_angles():
     #     1.571,
     #     0.785,
     # ]  # Example angles (in radians)
-    target_joint_angles = [0.04, 0.04]
+    target_joint_angles = [0.02, 0.02]
 
     # Ensure the number of target angles matches the number of joints in the group
     # if len(target_joint_angles) != len(move_group.get_joints()):
