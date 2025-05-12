@@ -175,55 +175,66 @@ def main():
             
             socket_send(action_conn, {'type': 'confirmation', 'status': 'received'})
             print("[Server] Sent action confirmation to client.")
-
-            gripper_pose_table = action_msg['gripper']
-            pos, quat = transform_pose(listener, gripper_pose_table[:7])
-            openness = gripper_pose_table[7]
-
-            # Execute action
-            target_pose = geometry_msgs.msg.Pose()
-            target_pose.position.x, target_pose.position.y, target_pose.position.z = pos
-            target_pose.orientation.x, target_pose.orientation.y, target_pose.orientation.z, target_pose.orientation.w = quat
-
-            waypoints = []
-            start_pose = move_group.get_current_pose().pose
-
-            # Add the target pose as a waypoint
-            waypoints.append(start_pose)  # Start pose
-            waypoints.append(target_pose)  # Target pose
-
-            # Try Cartesian path planning
-            (cartesian_plan, fraction) = move_group.compute_cartesian_path(
-                waypoints,   # waypoints to follow
-                0.01,        # eef_step (meters)
-                0.0          # jump_threshold
-            )
-
-            if False and fraction == 1.0:  # Cartesian planning succeeded
-                print("[Server] Cartesian path planning succeeded.")
-                
-                    # Fix trajectory timestamps
-                for i, point in enumerate(cartesian_plan.joint_trajectory.points):
-                    point.time_from_start = rospy.Duration(i * 0.1)  # Assign time in 0.1-second intervals
-                
-                move_group.execute(cartesian_plan, wait=True)
-            else:
-                print("[Server] Cartesian path planning failed. Falling back to default planning.")
-                move_group.set_pose_target(target_pose)
-                move_group.go(wait=True)
-
-            # Stop and clear targets
-            move_group.stop()
-            move_group.clear_pose_targets()
-            print("[Server] Movement complete.")
             
-            # Plan and execute gripper movement
-            print("[Server] Moving gripper to target joint values.")
-            gripper_group.set_joint_value_target([openness * 0.04, openness * 0.04])
-            gripper_group.go(wait=True)
-            gripper_group.stop()
-            gripper_group.clear_pose_targets()
-            print("[Server] Gripper movement complete.")
+            if action_msg['reset'] is True:
+                print("[Server] Resetting robot state.")
+                move_group.set_named_target("ready") # change for your robot
+                move_group.go(wait=True)
+                move_group.stop()
+                move_group.clear_pose_targets()
+                print("[Server] Robot reset complete.")
+                
+            else:
+                print("[Server] Executing action.")
+
+                gripper_pose_table = action_msg['gripper']
+                pos, quat = transform_pose(listener, gripper_pose_table[:7])
+                openness = gripper_pose_table[7]
+
+                # Execute action
+                target_pose = geometry_msgs.msg.Pose()
+                target_pose.position.x, target_pose.position.y, target_pose.position.z = pos
+                target_pose.orientation.x, target_pose.orientation.y, target_pose.orientation.z, target_pose.orientation.w = quat
+
+                waypoints = []
+                start_pose = move_group.get_current_pose().pose
+
+                # Add the target pose as a waypoint
+                waypoints.append(start_pose)  # Start pose
+                waypoints.append(target_pose)  # Target pose
+
+                # Try Cartesian path planning
+                (cartesian_plan, fraction) = move_group.compute_cartesian_path(
+                    waypoints,   # waypoints to follow
+                    0.01,        # eef_step (meters)
+                    0.0          # jump_threshold
+                )
+
+                if False and fraction == 1.0:  # Cartesian planning succeeded
+                    print("[Server] Cartesian path planning succeeded.")
+                    
+                        # Fix trajectory timestamps
+                    for i, point in enumerate(cartesian_plan.joint_trajectory.points):
+                        point.time_from_start = rospy.Duration(i * 0.1)  # Assign time in 0.1-second intervals
+                    
+                    move_group.execute(cartesian_plan, wait=True)
+                else:
+                    print("[Server] Cartesian path planning failed. Falling back to default planning.")
+                    move_group.set_pose_target(target_pose)
+                    move_group.go(wait=True)
+
+                # Stop and clear targets
+                move_group.stop()
+                move_group.clear_pose_targets()
+                print("[Server] Movement complete.")
+                
+                # Plan and execute gripper movement
+                print("[Server] Moving gripper to target joint values.")
+                gripper_group.set_joint_value_target([openness * 0.04, openness * 0.04])
+                gripper_group.go(wait=True)
+                gripper_group.stop()
+                gripper_group.clear_pose_targets()
+                print("[Server] Gripper movement complete.")
 
 
             # Collect observation
