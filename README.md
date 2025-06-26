@@ -40,6 +40,9 @@ Tested on **ROS 1** and we are working on a ROS2 verison
 
 ## Usage
 
+![image](https://github.com/user-attachments/assets/782dcc30-1946-4fb7-828e-4c47a35311a7)
+
+
 Basically we use another interface of websocket to communicate between the Learning method env and the ROS env. To aviod dealing with ROS python verison requirement.
 
 1. **Data collection**
